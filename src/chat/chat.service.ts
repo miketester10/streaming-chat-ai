@@ -30,7 +30,7 @@ export class ChatService {
         contents: userMessageDto.message,
         config: {
           systemInstruction:
-            'You are an helpful assistant. Repply always in markdown format (text/markdown).',
+            'You are a helpful assistant. Reply always in markdown format (text/markdown).',
           abortSignal: controller.signal,
         },
       });
@@ -57,7 +57,7 @@ export class ChatService {
       //   ],
       //   config: {
       //     systemInstruction:
-      //      'You are an helpful assistant. Repply always in markdown format (text/markdown).',
+      //      'You are a helpful assistant. Reply always in markdown format (text/markdown).',
       //     abortSignal: controller.signal,
       //   },
       // });
