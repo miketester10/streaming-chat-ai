@@ -28,8 +28,44 @@ export class ChatService {
       const stream = await this.ai.models.generateContentStream({
         model: env.GOOGLE_AI_MODEL,
         contents: userMessageDto.message,
-        config: { abortSignal: controller.signal },
+        config: {
+          systemInstruction:
+            'You are an helpful assistant. Repply always in markdown format (text/markdown).',
+          abortSignal: controller.signal,
+        },
       });
+
+      // const streamChat = this.ai.chats.create({
+      //   model: env.GOOGLE_AI_MODEL,
+      //   history: [
+      //     {
+      //       role: 'user',
+      //       parts: [
+      //         {
+      //           text: userMessageDto.message, // user message (modificare il DTO, questa è la chat vecchia)
+      //         },
+      //       ],
+      //     },
+      //     {
+      //       role: 'model',
+      //       parts: [
+      //         {
+      //           text: userMessageDto.message, // ai response (modificare il DTO, questa è la chat vecchia)
+      //         },
+      //       ],
+      //     },
+      //   ],
+      //   config: {
+      //     systemInstruction:
+      //      'You are an helpful assistant. Repply always in markdown format (text/markdown).',
+      //     abortSignal: controller.signal,
+      //   },
+      // });
+
+      // const response = await streamChat.sendMessage({
+      //   message: userMessageDto.message, (questo è il messaggio nuovo del client)
+      // });
+      // this.logger.debug(response.text);
 
       // Inizio Stream
       process.stdout.write(`\n🤖 AI Response for ${sessionId}: \n`);
