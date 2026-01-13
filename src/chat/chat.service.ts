@@ -26,7 +26,7 @@ export class ChatService {
 
     try {
       const stream = await this.ai.models.generateContentStream({
-        model: 'gemini-3-flash-preview',
+        model: env.GOOGLE_AI_MODEL,
         contents: userMessageDto.message,
         config: { abortSignal: controller.signal },
       });
