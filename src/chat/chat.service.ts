@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { Server } from 'socket.io';
 import {
   SuccessMessage,
@@ -7,13 +7,13 @@ import {
 } from './types/chat.types';
 import { GoogleGenAI } from '@google/genai';
 import { env } from 'src/config/env.schema';
+import { GOOGLE_AI_CLIENT } from '../ai/ai.module';
 
 @Injectable()
 export class ChatService {
   private readonly logger = new Logger(ChatService.name);
-  private readonly ai = new GoogleGenAI({ apiKey: env.GOOGLE_AI_API_KEY });
 
-  constructor() {}
+  constructor(@Inject(GOOGLE_AI_CLIENT) private readonly ai: GoogleGenAI) {}
 
   async streamAiResponse(
     server: Server,
