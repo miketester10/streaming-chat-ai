@@ -32,11 +32,16 @@ export class ChatService {
       });
 
       // Inizio Stream
+      process.stdout.write(`\n🤖 AI Response for ${sessionId}: \n`);
+
       for await (const chunk of stream) {
         const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!text) continue;
-        this.logger.debug(`Stream chunk for ${sessionId}: ${text}`);
+
+        // Effetto "typing" in console
+        process.stdout.write(text);
+
         successMessage = {
           role: 'model',
           content: text,
@@ -44,6 +49,8 @@ export class ChatService {
         };
         server.to(sessionId).emit('receiveMessage', successMessage);
       }
+
+      process.stdout.write('\n'); // Fine linea dopo lo stream
 
       // Fine Stream
       successMessage = {
