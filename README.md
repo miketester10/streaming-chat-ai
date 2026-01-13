@@ -24,6 +24,13 @@ This project demonstrates a production-ready approach to handling WebSocket conn
 - **AI Model**: Google Generative AI (Gemini 1.5 Flash)
 - **Validation**: `zod`
 
+## 🏗 Architecture & Design Decisions
+
+- **Custom AI Provider**: Instead of hardcoding the `GoogleGenAI` client, it is provided via a factory in a dedicated `AiModule`. This enhances testability by allowing the AI client to be easily mocked.
+- **Explicit Dependency Injection**: Each module explicitly declares its dependencies, ensuring a clear and maintainable dependency graph.
+- **Validation Layer**: Uses `Zod` to validate incoming WebSocket messages at runtime, ensuring the core logic only handles well-formed data.
+- **Environment Safety**: Configuration is validated at startup using a schema, preventing the application from running with missing or invalid credentials.
+
 ## ⚙️ Prerequisites
 
 - **Node.js**: v18 or later
