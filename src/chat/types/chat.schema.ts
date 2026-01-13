@@ -9,7 +9,7 @@ export type UserMessageDto = z.infer<typeof UserMessageSchema>;
 
 // Messaggio inviato al frontend
 const AiMessageSchema = z.object({
-  role: z.literal('model'),
+  role: z.enum(['system', 'model', 'user']),
   content: z.string(),
   done: z.boolean(),
   error: z.string().optional(),

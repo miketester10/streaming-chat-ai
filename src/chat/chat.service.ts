@@ -4,7 +4,7 @@ import {
   SuccessMessage,
   ErrorMessage,
   UserMessageDto,
-} from './types/chat.types';
+} from './types/chat.schema';
 import { GoogleGenAI } from '@google/genai';
 import { env } from 'src/config/env.schema';
 import { GOOGLE_AI_CLIENT } from '../ai/ai.module';
@@ -19,7 +19,7 @@ export class ChatService {
     server: Server,
     sessionId: string,
     userMessageDto: UserMessageDto,
-    controller: AbortController,
+    abortController: AbortController,
   ): Promise<void> {
     let successMessage: SuccessMessage;
     let errorMessage: ErrorMessage;
@@ -31,7 +31,7 @@ export class ChatService {
         config: {
           systemInstruction:
             'You are a helpful assistant. Reply always in markdown format (text/markdown).',
-          abortSignal: controller.signal,
+          abortSignal: abortController.signal,
         },
       });
 
@@ -71,7 +71,7 @@ export class ChatService {
       process.stdout.write(`\n🤖 AI Response for ${sessionId}: \n`);
 
       for await (const chunk of stream) {
-        const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text;
+        const text = chunk.text;
 
         if (!text) continue;
 
@@ -96,7 +96,7 @@ export class ChatService {
       };
       server.to(sessionId).emit('receiveMessage', successMessage);
     } catch (err) {
-      // Abort = non è un errore applicativo
+      // AbortError = non è un errore applicativo
       if ((err as Error).name === 'AbortError') {
         this.logger.debug(`Stream aborted for ${sessionId}`);
         return;
@@ -106,7 +106,7 @@ export class ChatService {
 
       // Errore formale
       errorMessage = {
-        role: 'model',
+        role: 'system',
         content: '',
         error: 'Errore durante la generazione della risposta',
         done: true,

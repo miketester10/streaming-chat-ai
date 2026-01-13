@@ -21,7 +21,7 @@ This project demonstrates a production-ready approach to handling WebSocket conn
 - **Framework**: [NestJS](https://nestjs.com/)
 - **Language**: TypeScript
 - **WebSockets**: `@nestjs/websockets`, `socket.io`
-- **AI Model**: Google Generative AI (Gemini 1.5 Flash)
+- **AI Model**: Google Generative AI (Gemini 3 Pro)
 - **Validation**: `zod`
 
 ## 🏗 Architecture & Design Decisions
@@ -121,7 +121,7 @@ Emits chunks of the AI response or errors.
 
 ```json
 {
-  "role": "model",
+  "role": "system",
   "content": "",
   "error": "Error message description",
   "done": true

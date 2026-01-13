@@ -10,7 +10,7 @@ import {
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
-import { UserMessageSchema } from './types/chat.types';
+import { UserMessageSchema } from './types/chat.schema';
 import z from 'zod';
 
 @WebSocketGateway({ cors: true })
@@ -64,15 +64,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    const controller = new AbortController();
-    this.sessions.set(sessionId, controller);
+    const abortController = new AbortController();
+    this.sessions.set(sessionId, abortController);
 
     // Avvia streaming AI
     await this.chatService.streamAiResponse(
       this.server,
       sessionId,
       parsed.data,
-      controller,
+      abortController,
     );
 
     // Pulizia dopo completamento
