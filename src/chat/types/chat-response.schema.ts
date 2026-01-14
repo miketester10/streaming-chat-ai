@@ -6,11 +6,9 @@ export const ResponseMessageSchema = z.object({
   role: z.enum(['system', 'model', 'user']),
   content: z.string(),
   done: z.boolean(),
-  error: z.string().optional(),
 });
 
-export type SuccessMessage = Omit<
-  z.infer<typeof ResponseMessageSchema>,
-  'error'
->;
-export type ErrorMessage = SuccessMessage & { error: string };
+export type SuccessMessage = z.infer<typeof ResponseMessageSchema>;
+export type ErrorMessage = z.infer<typeof ResponseMessageSchema> & {
+  error: string;
+};
