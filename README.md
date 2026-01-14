@@ -11,8 +11,10 @@ This project demonstrates a production-ready approach to handling WebSocket conn
 ## 🚀 Features
 
 - **Real-time Communication**: Full-duplex communication using WebSockets (Socket.io).
-- **AI Streaming**: Integration with Google Gemini Flash for low-latency token streaming.
-- **Robust Validation**: Zod schemas for runtime payload validation.
+- **Multi-turn Conversations**: Support for chat history to maintain context throughout the session.
+- **AI Streaming**: Integration with Google Gemini for low-latency token streaming.
+- **System Instructions**: Customizable AI personality and instructions for refined responses.
+- **Robust Validation**: Complex Zod schemas for runtime payload and history validation.
 - **Concurrency Control**: Manages multiple sessions and user aborts gracefully.
 - **Type Safety**: Strictly typed events and DTOs using TypeScript.
 
@@ -83,15 +85,28 @@ The backend exposes a Socket.io gateway namespace at `/` (default).
 
 #### ➤ Client -> Server: `sendMessage`
 
-Sends a prompt to the AI.
+Sends a prompt to the AI along with the conversation history.
 
 **Payload**:
 
 ```json
 {
-  "message": "Hello, tell me a joke!"
+  "history": [
+    {
+      "role": "user",
+      "parts": [{ "text": "Hello!" }]
+    },
+    {
+      "role": "model",
+      "parts": [{ "text": "Hi there! How can I help you today?" }]
+    }
+  ],
+  "newMessage": "Tell me a joke!"
 }
 ```
+
+> [!NOTE]
+> The `history` field is validated to ensure it follows the correct structure and length limits (max 6 messages).
 
 #### ➤ Server -> Client: `receiveMessage`
 
