@@ -64,8 +64,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (!parsed.success) {
       this.logger.error(
-        'Invalid payload',
-        z.treeifyError(parsed.error).properties,
+        `Invalid payload: ${JSON.stringify(z.treeifyError(parsed.error).properties, null, 2)}`,
       );
       return;
     }
