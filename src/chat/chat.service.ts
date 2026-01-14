@@ -1,13 +1,10 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { Server } from 'socket.io';
-import {
-  SuccessMessage,
-  ErrorMessage,
-  UserMessageDto,
-} from './types/chat.schema';
 import { GoogleGenAI } from '@google/genai';
 import { env } from 'src/config/env.schema';
 import { GOOGLE_AI_CLIENT } from '../ai/ai.module';
+import { ChatRequestDto } from './types/chat-request.schema';
+import { ErrorMessage, SuccessMessage } from './types/chat-response.schema';
 
 @Injectable()
 export class ChatService {
@@ -18,16 +15,16 @@ export class ChatService {
   async streamAiResponse(
     server: Server,
     sessionId: string,
-    userMessageDto: UserMessageDto,
+    chatRequestDto: ChatRequestDto,
     abortController: AbortController,
   ): Promise<void> {
     let successMessage: SuccessMessage;
     let errorMessage: ErrorMessage;
 
     try {
-      const stream = await this.ai.models.generateContentStream({
+      const streamChat = this.ai.chats.create({
         model: env.GOOGLE_AI_MODEL,
-        contents: userMessageDto.message,
+        history: chatRequestDto.history,
         config: {
           systemInstruction:
             'You are a helpful assistant. Reply always in markdown format (text/markdown).',
@@ -35,42 +32,14 @@ export class ChatService {
         },
       });
 
-      // const streamChat = this.ai.chats.create({
-      //   model: env.GOOGLE_AI_MODEL,
-      //   history: [
-      //     {
-      //       role: 'user',
-      //       parts: [
-      //         {
-      //           text: userMessageDto.message, // user message (modificare il DTO, questa è la chat vecchia)
-      //         },
-      //       ],
-      //     },
-      //     {
-      //       role: 'model',
-      //       parts: [
-      //         {
-      //           text: userMessageDto.message, // ai response (modificare il DTO, questa è la chat vecchia)
-      //         },
-      //       ],
-      //     },
-      //   ],
-      //   config: {
-      //     systemInstruction:
-      //      'You are a helpful assistant. Reply always in markdown format (text/markdown).',
-      //     abortSignal: controller.signal,
-      //   },
-      // });
-
-      // const response = await streamChat.sendMessage({
-      //   message: userMessageDto.message, (questo è il messaggio nuovo del client)
-      // });
-      // this.logger.debug(response.text);
+      const response = await streamChat.sendMessageStream({
+        message: chatRequestDto.newMessage,
+      });
 
       // Inizio Stream
       process.stdout.write(`\n🤖 AI Response for ${sessionId}: \n`);
 
-      for await (const chunk of stream) {
+      for await (const chunk of response) {
         const text = chunk.text;
 
         if (!text) continue;
