@@ -36,7 +36,7 @@ export class WsJwtGuard implements CanActivate {
         },
       );
 
-      // Attach jwtPayload to client in the user property for later use
+      // Collega il jwtPayload al client nella proprietà user per usi successivi
       client.data.user = jwtPayload;
 
       return true;

@@ -8,9 +8,9 @@ export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
   login(loginDto: LoginDto): LoginResponseDto {
-    // In a real app, we would use a real bcrypt check and store data in a database.
-    // For this demo, let's just use a simple check since I don't have the real hash for 'password' handy
-    // and I'll use a fixed secret for JWT.
+    // In un'app reale, useremmo un controllo bcrypt reale e memorizzeremmo i dati in un database.
+    // Per questa demo, usiamo un semplice controllo poiché non ho l'hash reale per 'password'
+    // e userò un segreto fisso per il JWT.
     if (
       loginDto.email === 'admin@admin.com' &&
       loginDto.password === '123456'
