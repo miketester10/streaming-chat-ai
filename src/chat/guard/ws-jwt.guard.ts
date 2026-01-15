@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
 import { JwtPayload } from '@/auth/interface/jwt-payload.interface';
-import { AuthenticatedSocket } from '@/chat/types/authenticated-socket';
+import { AuthenticatedSocket } from '@/chat/interface/authenticated-socket.interface';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {

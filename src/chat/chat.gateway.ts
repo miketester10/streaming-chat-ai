@@ -12,7 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from '@/chat/chat.service';
 import { ChatRequestSchema } from '@/chat/types/chat-request.schema';
 import { WsJwtGuard } from '@/chat/guard/ws-jwt.guard';
-import { AuthenticatedSocket } from '@/chat/types/authenticated-socket';
+import { AuthenticatedSocket } from '@/chat/interface/authenticated-socket.interface';
 import z from 'zod';
 
 @WebSocketGateway({ cors: true })
