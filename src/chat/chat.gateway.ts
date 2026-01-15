@@ -7,11 +7,13 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { ChatRequestSchema } from './types/chat-request.schema';
+import { WsJwtGuard } from './ws-jwt.guard';
 import z from 'zod';
+import { JwtPayload } from 'src/auth/interface/jwt-payload.interface';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -38,12 +40,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.debug(`Client disconnected: ${sessionId}`);
   }
 
+  @UseGuards(WsJwtGuard)
   @SubscribeMessage('sendMessage')
   async handleMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: unknown,
   ): Promise<void> {
     const sessionId = client.id;
+
+    // Accediamo al payload del jwt token, se ha passato la verifica nel WsJwtGuard
+    const jwtPayload = (client.data as { user: JwtPayload }).user;
+    this.logger.debug(jwtPayload);
 
     // Blocca se c'è uno stream in corso
     if (this.sessions.has(sessionId)) {

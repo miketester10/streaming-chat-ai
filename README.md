@@ -15,6 +15,7 @@ This project demonstrates a production-ready approach to handling WebSocket conn
 - **AI Streaming**: Integration with Google Gemini for low-latency token streaming.
 - **System Instructions**: Customizable AI personality and instructions for refined responses.
 - **Robust Validation**: Complex Zod schemas for runtime payload and history validation.
+- **Authentication**: JWT-based authentication for secure WebSocket communication.
 - **Concurrency Control**: Manages multiple sessions and user aborts gracefully.
 - **Type Safety**: Strictly typed events and DTOs using TypeScript.
 
@@ -64,6 +65,36 @@ This project demonstrates a production-ready approach to handling WebSocket conn
    GOOGLE_AI_MODEL=gemini-3-flash-preview
    ```
 
+## 🔐 Authentication
+
+The application uses **JWT (JSON Web Token)** to protect the chat socket.
+
+### ➤ Login
+
+To obtain a token, send a POST request to `/auth/login`.
+
+**Endpoint**: `POST /auth/login`
+
+**Payload**:
+
+```json
+{
+  "email": "admin@admin.com",
+  "password": "123456"
+}
+```
+
+**Response**:
+
+```json
+{
+  "access_token": "your_jwt_token_here"
+}
+```
+
+> [!TIP]
+> Use the credentials above for testing purposes.
+
 ## ▶️ Running the App
 
 ```bash
@@ -80,6 +111,32 @@ The server runs on **port 3000** by default.
 ## 🔌 WebSocket API documentation
 
 The backend exposes a Socket.io gateway namespace at `/` (default).
+
+### Authentication
+
+To connect to the WebSocket, you must provide the JWT token obtained from the login step. You can provide it in two ways:
+
+1.  **Handshake Connection**: Use the `auth` object in the Socket.io client options.
+
+    ```javascript
+    const socket = io('http://localhost:3000', {
+      auth: {
+        token: 'your_jwt_token_here',
+      },
+    });
+    ```
+
+2.  **Authorization Header**: Pass it in the headers during connection.
+    ```javascript
+    const socket = io('http://localhost:3000', {
+      extraHeaders: {
+        Authorization: 'Bearer your_jwt_token_here',
+      },
+    });
+    ```
+
+> [!IMPORTANT]
+> The `sendMessage` event is protected by a Guard. If the token is missing or invalid, the server will throw a `WsException`.
 
 ### Events
 
