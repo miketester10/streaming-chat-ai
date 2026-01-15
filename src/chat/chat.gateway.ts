@@ -12,8 +12,8 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { ChatRequestSchema } from './types/chat-request.schema';
 import { WsJwtGuard } from './ws-jwt.guard';
+import { AuthenticatedSocket } from './types/authenticated-socket';
 import z from 'zod';
-import { JwtPayload } from 'src/auth/interface/jwt-payload.interface';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -43,13 +43,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('sendMessage')
   async handleMessage(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() payload: unknown,
   ): Promise<void> {
     const sessionId = client.id;
 
     // Accediamo al payload del jwt token, se ha passato la verifica nel WsJwtGuard
-    const jwtPayload = (client.data as { user: JwtPayload }).user;
+    const jwtPayload = client.data.user;
     this.logger.debug(jwtPayload);
 
     // Blocca se c'è uno stream in corso

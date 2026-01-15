@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
 import { JwtPayload } from 'src/auth/interface/jwt-payload.interface';
+import { AuthenticatedSocket } from './types/authenticated-socket';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {
@@ -17,7 +17,7 @@ export class WsJwtGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
-      const client: Socket = context.switchToWs().getClient();
+      const client = context.switchToWs().getClient<AuthenticatedSocket>();
 
       const authToken = (client.handshake.auth.token ||
         client.handshake.headers.authorization?.split(' ')[1]) as
@@ -37,8 +37,7 @@ export class WsJwtGuard implements CanActivate {
       );
 
       // Attach jwtPayload to client in the user property for later use
-      const clientData = client.data as { user: JwtPayload };
-      clientData.user = jwtPayload;
+      client.data.user = jwtPayload;
 
       return true;
     } catch (err) {
