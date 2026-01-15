@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GoogleGenAI } from '@google/genai';
-import { env } from '../config/env.schema';
+import { env } from '@/config/env.schema';
 
 export const GOOGLE_AI_CLIENT = 'GOOGLE_AI_CLIENT';
 

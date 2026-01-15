@@ -9,10 +9,10 @@ import {
 } from '@nestjs/websockets';
 import { Logger, UseGuards } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { ChatService } from './chat.service';
-import { ChatRequestSchema } from './types/chat-request.schema';
-import { WsJwtGuard } from './guard/ws-jwt.guard';
-import { AuthenticatedSocket } from './types/authenticated-socket';
+import { ChatService } from '@/chat/chat.service';
+import { ChatRequestSchema } from '@/chat/types/chat-request.schema';
+import { WsJwtGuard } from '@/chat/guard/ws-jwt.guard';
+import { AuthenticatedSocket } from '@/chat/types/authenticated-socket';
 import z from 'zod';
 
 @WebSocketGateway({ cors: true })

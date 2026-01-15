@@ -1,10 +1,13 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { Server } from 'socket.io';
 import { GoogleGenAI } from '@google/genai';
-import { env } from 'src/config/env.schema';
-import { GOOGLE_AI_CLIENT } from '../ai/ai.module';
-import { ChatRequestDto } from './types/chat-request.schema';
-import { ErrorMessage, SuccessMessage } from './types/chat-response.schema';
+import { env } from '@/config/env.schema';
+import { GOOGLE_AI_CLIENT } from '@/ai/ai.module';
+import { ChatRequestDto } from '@/chat/types/chat-request.schema';
+import {
+  ErrorMessage,
+  SuccessMessage,
+} from '@/chat/types/chat-response.schema';
 
 @Injectable()
 export class ChatService {
