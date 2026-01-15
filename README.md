@@ -2,6 +2,7 @@
 
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <a href="https://socket.io/" target="blank"><img src="https://socket.io/images/logo.svg" width="120" alt="Socket.io Logo" /></a>
 </p>
 
 Backend service for a real-time streaming chat application powered by **NestJS**, **Socket.io**, and **Google Gemini AI**.
