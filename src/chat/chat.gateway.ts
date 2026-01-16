@@ -6,14 +6,15 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  WsException,
 } from '@nestjs/websockets';
 import { Logger, UseGuards } from '@nestjs/common';
 import { Namespace, Socket } from 'socket.io';
 import { ChatService } from '@/chat/chat.service';
-import { ChatRequestSchema } from '@/chat/types/chat-request.schema';
 import { WsJwtGuard } from '@/chat/guard/ws-jwt.guard';
 import { AuthenticatedSocket } from '@/chat/interface/authenticated-socket.interface';
-import z from 'zod';
+import { validate } from '@/chat/util/validate.util';
+import { ChatRequestDto } from '@/chat/types/chat-request.schema';
 
 @WebSocketGateway({ cors: true, namespace: 'chat-ai' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -52,8 +53,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() payload: unknown,
   ): Promise<void> {
     const sessionId = client.id;
+    let chatRequestDto: ChatRequestDto;
 
-    // Accediamo al payload del jwt token, se ha passato la verifica nel WsJwtGuard
+    // Accediamo al payload del jwt token, se ha passato la verifica nel WsJwtGuard (attualmente viene solo stampato nella console)
     const jwtPayload = client.data.user;
     this.logger.debug(jwtPayload);
 
@@ -63,22 +65,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    // Parsing payload
+    // Validate payload
     try {
-      payload = typeof payload === 'string' ? JSON.parse(payload) : payload;
+      chatRequestDto = validate(payload);
     } catch (err) {
-      this.logger.error(`Invalid JSON payload: ${(err as Error).message}`);
-      return;
-    }
-
-    // Validazione con Zod
-    const parsed = ChatRequestSchema.safeParse(payload);
-
-    if (!parsed.success) {
-      this.logger.error(
-        `Invalid payload: ${JSON.stringify(z.treeifyError(parsed.error).properties, null, 2)}`,
+      this.logger.error(`Error validating payload: ${(err as Error).message}`);
+      throw new WsException(
+        `Error validating payload: ${(err as Error).message}`,
       );
-      return;
     }
 
     const abortController = new AbortController();
@@ -88,7 +82,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.chatService.streamAiResponse(
       this.server,
       sessionId,
-      parsed.data,
+      chatRequestDto,
       abortController,
     );
 
