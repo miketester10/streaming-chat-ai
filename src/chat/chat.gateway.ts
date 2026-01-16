@@ -8,26 +8,28 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Logger, UseGuards } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
+import { Namespace, Socket } from 'socket.io';
 import { ChatService } from '@/chat/chat.service';
 import { ChatRequestSchema } from '@/chat/types/chat-request.schema';
 import { WsJwtGuard } from '@/chat/guard/ws-jwt.guard';
 import { AuthenticatedSocket } from '@/chat/interface/authenticated-socket.interface';
 import z from 'zod';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ cors: true, namespace: 'chat-ai' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  private readonly server: Server;
+  private readonly server: Namespace;
   private readonly logger = new Logger(ChatGateway.name);
   private readonly sessions = new Map<string, AbortController>(); // sessionId -> AbortController
 
   constructor(private readonly chatService: ChatService) {}
 
-  async handleConnection(client: Socket): Promise<void> {
+  handleConnection(client: Socket): void {
     const sessionId = client.id;
-    await client.join(sessionId);
-    this.logger.debug(`Client connected: ${sessionId}`);
+    const sockets = this.server.sockets;
+    this.logger.debug(
+      `Client connected: ${sessionId}, Total clients: ${sockets.size}`,
+    );
   }
 
   handleDisconnect(client: Socket): void {
@@ -37,7 +39,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.sessions.get(sessionId)?.abort();
     this.sessions.delete(sessionId);
 
-    this.logger.debug(`Client disconnected: ${sessionId}`);
+    const sockets = this.server.sockets;
+    this.logger.debug(
+      `Client disconnected: ${sessionId}, Total clients: ${sockets.size}`,
+    );
   }
 
   @UseGuards(WsJwtGuard)

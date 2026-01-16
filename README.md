@@ -111,7 +111,7 @@ The server runs on **port 3000** by default.
 
 ## 🔌 WebSocket API documentation
 
-The backend exposes a Socket.io gateway namespace at `/` (default).
+The backend exposes a Socket.io gateway namespace at `/chat-ai`.
 
 ### Authentication
 
@@ -120,7 +120,7 @@ To connect to the WebSocket, you must provide the JWT token obtained from the lo
 1.  **Handshake Connection**: Use the `auth` object in the Socket.io client options.
 
     ```javascript
-    const socket = io('http://localhost:3000', {
+    const socket = io('http://localhost:3000/chat-ai', {
       auth: {
         token: 'your_jwt_token_here',
       },
@@ -128,8 +128,9 @@ To connect to the WebSocket, you must provide the JWT token obtained from the lo
     ```
 
 2.  **Authorization Header**: Pass it in the headers during connection.
+
     ```javascript
-    const socket = io('http://localhost:3000', {
+    const socket = io('http://localhost:3000/chat-ai', {
       extraHeaders: {
         Authorization: 'Bearer your_jwt_token_here',
       },

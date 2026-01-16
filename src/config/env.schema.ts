@@ -7,10 +7,7 @@ const EnvSchema = z.object({
     .string()
     .trim()
     .nonempty('GOOGLE_AI_API_KEY is required.'),
-  GOOGLE_AI_MODEL: z
-    .string()
-    .trim()
-    .nonempty('GOOGLE_AI_MODEL is required.'),
+  GOOGLE_AI_MODEL: z.string().trim().nonempty('GOOGLE_AI_MODEL is required.'),
 });
 
 const envParsed = EnvSchema.safeParse(process.env);

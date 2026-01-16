@@ -1,5 +1,5 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { Server } from 'socket.io';
+import { Namespace, Server } from 'socket.io';
 import { GoogleGenAI } from '@google/genai';
 import { env } from '@/config/env.schema';
 import { GOOGLE_AI_CLIENT } from '@/ai/ai.module';
@@ -16,7 +16,7 @@ export class ChatService {
   constructor(@Inject(GOOGLE_AI_CLIENT) private readonly ai: GoogleGenAI) {}
 
   async streamAiResponse(
-    server: Server,
+    server: Namespace,
     sessionId: string,
     chatRequestDto: ChatRequestDto,
     abortController: AbortController,
