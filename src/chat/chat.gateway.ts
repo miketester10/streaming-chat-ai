@@ -12,7 +12,6 @@ import { Namespace, Socket } from 'socket.io';
 import { ChatService } from '@/chat/chat.service';
 import { WsJwtGuard } from '@/chat/guard/ws-jwt.guard';
 import { AuthenticatedSocket } from '@/chat/interface/authenticated-socket.interface';
-
 import {
   ChatRequestDto,
   ChatRequestSchema,
