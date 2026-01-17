@@ -1,5 +1,5 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { Namespace, Server } from 'socket.io';
+import { Namespace } from 'socket.io';
 import { GoogleGenAI } from '@google/genai';
 import { env } from '@/config/env.schema';
 import { GOOGLE_AI_CLIENT } from '@/ai/ai.module';
@@ -80,7 +80,7 @@ export class ChatService {
       errorMessage = {
         role: 'system',
         content: '',
-        error: 'Errore durante la generazione della risposta',
+        error: 'Error generating response',
         done: true,
       };
       server.to(sessionId).emit('receiveMessage', errorMessage);

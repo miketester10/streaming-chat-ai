@@ -32,7 +32,8 @@ This project demonstrates a production-ready approach to handling WebSocket conn
 
 - **Custom AI Provider**: Instead of hardcoding the `GoogleGenAI` client, it is provided via a factory in a dedicated `AiModule`. This enhances testability by allowing the AI client to be easily mocked.
 - **Explicit Dependency Injection**: Each module explicitly declares its dependencies, ensuring a clear and maintainable dependency graph.
-- **Validation Layer**: Uses `Zod` to validate incoming WebSocket messages at runtime, ensuring the core logic only handles well-formed data.
+- **Validation Layer**: Uses a custom `ZodValidationPipe` to validate incoming WebSocket messages at the Gateway level. This ensures the core logic only handles well-formed data and provides consistent error responses.
+- **Structured Error Handling**: Implements a unified error format for authentication and validation failures, making it easier for client-side applications to handle different error scenarios.
 - **Environment Safety**: Configuration is validated at startup using a schema, preventing the application from running with missing or invalid credentials.
 
 ## ⚙️ Prerequisites
@@ -167,9 +168,23 @@ Sends a prompt to the AI along with the conversation history.
 > [!NOTE]
 > The `history` field is validated to ensure it follows the correct structure and length limits (max 6 messages).
 
+#### ➤ Server -> Client: `exception`
+
+Emitted when a system-level error occurs (Authentication or Validation).
+
+**Response**:
+
+```json
+{
+  "type": "VALIDATION_ERROR | UNAUTHORIZED_ERROR",
+  "message": "Error description",
+  "errors": [] // Optional details (for validation)
+}
+```
+
 #### ➤ Server -> Client: `receiveMessage`
 
-Emits chunks of the AI response or errors.
+Emits chunks of the AI response or errors encountered **during** the stream.
 
 **Success Response (Streaming)**:
 
@@ -191,13 +206,13 @@ Emits chunks of the AI response or errors.
 }
 ```
 
-**Error**:
+**AI Streaming Error**:
 
 ```json
 {
   "role": "system",
   "content": "",
-  "error": "Error message description",
+  "error": "Error generating response",
   "done": true
 }
 ```

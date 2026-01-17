@@ -6,15 +6,18 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  WsException,
 } from '@nestjs/websockets';
 import { Logger, UseGuards } from '@nestjs/common';
 import { Namespace, Socket } from 'socket.io';
 import { ChatService } from '@/chat/chat.service';
 import { WsJwtGuard } from '@/chat/guard/ws-jwt.guard';
 import { AuthenticatedSocket } from '@/chat/interface/authenticated-socket.interface';
-import { validate } from '@/chat/util/validate.util';
-import { ChatRequestDto } from '@/chat/types/chat-request.schema';
+
+import {
+  ChatRequestDto,
+  ChatRequestSchema,
+} from '@/chat/types/chat-request.schema';
+import { ZodValidationPipe } from '@/chat/pipe/zod-validation.pipe';
 
 @WebSocketGateway({ cors: true, namespace: 'chat-ai' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -49,30 +52,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('sendMessage')
   async handleMessage(
-    @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() payload: unknown,
+    @ConnectedSocket()
+    client: AuthenticatedSocket,
+    @MessageBody(new ZodValidationPipe(ChatRequestSchema))
+    chatRequestDto: ChatRequestDto,
   ): Promise<void> {
     const sessionId = client.id;
-    let chatRequestDto: ChatRequestDto;
 
     // Accediamo al payload del jwt token, se ha passato la verifica nel WsJwtGuard (attualmente viene solo stampato nella console)
+    // In futuro si puo implementare un metodo per recuperare la history dello user direttamente dal database senza riceverla dal frontend.
     const jwtPayload = client.data.user;
     this.logger.debug(jwtPayload);
 
-    // Blocca se c'è uno stream in corso
+    // Blocca se c'è già uno stream in corso
     if (this.sessions.has(sessionId)) {
       this.logger.warn(`Stream already running for ${sessionId}`);
       return;
-    }
-
-    // Validate payload
-    try {
-      chatRequestDto = validate(payload);
-    } catch (err) {
-      this.logger.error(`Error validating payload: ${(err as Error).message}`);
-      throw new WsException(
-        `Error validating payload: ${(err as Error).message}`,
-      );
     }
 
     const abortController = new AbortController();

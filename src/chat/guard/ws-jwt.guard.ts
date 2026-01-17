@@ -26,7 +26,7 @@ export class WsJwtGuard implements CanActivate {
 
       if (!authToken) {
         this.logger.error('No token found in handshake');
-        throw new WsException('Missing token.');
+        throw new Error('Missing token.');
       }
 
       const jwtPayload = await this.jwtService.verifyAsync<JwtPayload>(
@@ -42,7 +42,10 @@ export class WsJwtGuard implements CanActivate {
       return true;
     } catch (err) {
       this.logger.error(`${(err as Error).message}`);
-      throw new WsException('Unauthorized. Missing or invalid token.');
+      throw new WsException({
+        type: 'UNAUTHORIZED_ERROR',
+        message: 'Missing or invalid token.',
+      });
     }
   }
 }
